@@ -163,22 +163,12 @@ def pull_edit_histories(
 
     sampled_users = sampled_users.reset_index()
 
-    for i in range(len(sampled_users)//users_per_chunk):
-      if os.path.exists(edit_histories_file_pattern.format(i*users_per_chunk)):
-        # print(edit_histories_file_pattern.format(i*users_per_chunk))
-        start=((i+1)*users_per_chunk)
-      else:
-        break
-        
-    print("Starting from {}".format(start))
-
     # Iterate through all the users in the list
     for i, (user, userid) in tqdm(
         iterable=enumerate(
             zip(sampled_users["user"][start:], sampled_users["userid"][start:]),
             start=start),
-        total=len(sampled_users)-start,
-        position=0, leave=True): 
+        total=len(sampled_users)): 
 
         # Get the history of edits for this userid
         thehistory = get_edit_history(

@@ -2,3 +2,4 @@ wikipedia
 umap
 itables
 PyYAML>=5.4.1
+implicit
