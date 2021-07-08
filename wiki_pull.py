@@ -9,7 +9,7 @@ from pyarrow import feather
 def get_recent_changes(N):
     S = requests.Session()
 
-    t = tqdm(total=N)
+    t = tqdm(total=N, position=0, leave=True)
 
     URL = "https://en.wikipedia.org/w/api.php"
 
@@ -168,9 +168,9 @@ def pull_edit_histories(
     for i, (user, userid) in tqdm(
         iterable=enumerate(
             zip(sampled_users["user"][start:], sampled_users["userid"][start:]),
-            start=start,
-        ),
+            start=start),
         total=len(sampled_users),
+        position=0, leave=True,
         initial=start,
     ):
         # Get the history of edits for this userid
