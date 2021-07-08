@@ -1,3 +1,11 @@
+import pandas as pd
+import numpy as np
+import requests
+import time
+from tqdm import tqdm
+from pyarrow import feather
+
+
 def get_recent_changes(N):
     S = requests.Session()
 
