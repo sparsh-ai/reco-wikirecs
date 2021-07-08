@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import requests
 import time
+import os
 from tqdm import tqdm
 from pyarrow import feather
 
@@ -89,8 +90,7 @@ def get_sample_of_users(edit_lookback, outfile=None):
 
 
 def get_edit_history(
-    userid=None, user=None, latest_timestamp=None, earliest_timestamp=None, limit=None
-):
+    userid=None, user=None, latest_timestamp=None, earliest_timestamp=None, limit=None):
     """For a particular user, pull their whole history of edits.
     Args:
         param1 (int): The first parameter.
@@ -155,8 +155,7 @@ def pull_edit_histories(
     edit_histories_file_pattern,
     users_per_chunk,
     earliest_timestamp,
-    start=0,
-):
+    start=0):
     histories = []
     cols = ["userid", "user", "pageid", "title", "timestamp", "sizediff"]
     sampled_users = pd.read_csv(sampled_users_file)
@@ -164,15 +163,23 @@ def pull_edit_histories(
 
     sampled_users = sampled_users.reset_index()
 
+    for i in range(len(sampled_users)//users_per_chunk):
+      if os.path.exists(edit_histories_file_pattern.format(i*users_per_chunk)):
+        # print(edit_histories_file_pattern.format(i*users_per_chunk))
+        start=((i+1)*users_per_chunk)
+      else:
+        break
+        
+    print("Starting from {}".format(start))
+
     # Iterate through all the users in the list
     for i, (user, userid) in tqdm(
         iterable=enumerate(
             zip(sampled_users["user"][start:], sampled_users["userid"][start:]),
             start=start),
-        total=len(sampled_users),
-        position=0, leave=True,
-        initial=start,
-    ):
+        total=len(sampled_users)-start,
+        position=0, leave=True): 
+
         # Get the history of edits for this userid
         thehistory = get_edit_history(
             userid=int(userid), earliest_timestamp=earliest_timestamp
@@ -197,12 +204,12 @@ def pull_edit_histories(
 
         histories.append(thehistory.loc[:, cols])
 
-        if np.mod(i, 50) == 0:
-            print(
-                "Most recent: {}/{} {} ({}) has {} edits".format(
-                    i, len(sampled_users), user, int(userid), len(thehistory)
-                )
-            )
+        # if np.mod(i, 50) == 0:
+        #     print(
+        #         "Most recent: {}/{} {} ({}) has {} edits".format(
+        #             i, len(sampled_users), user, int(userid), len(thehistory)
+        #         )
+        #     )
 
         # Every x users save it out, for the sake of ram limitations
         if np.mod(i, users_per_chunk) == 0:
@@ -211,6 +218,6 @@ def pull_edit_histories(
             )
 
             histories = []
-
+      
     # Get the last few users that don't make up a full chunk
     feather.write_feather(pd.concat(histories), edit_histories_file_pattern.format(i))

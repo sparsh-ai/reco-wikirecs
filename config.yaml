@@ -1,4 +1,4 @@
-file_save_path: "/content"
+file_save_path: "/content/drive/MyDrive/TempData/WikiRecs"
 suffix: "2021_07_08"
 outfile: "sampled_users_2021_07_08.csv" # CSV file to write the resulting user names and ids to
 edit_histories_file_pattern: "edit_histories_2021_07_08_{}.feather" # Output for edit histories (needs a {} for where to place the number)
@@ -6,4 +6,4 @@ edit_histories_file_pattern: "edit_histories_2021_07_08_{}.feather" # Output for
 edit_lookback: 1000000 # How many edits to look back in Wikipedia history
 users_per_chunk: 500 # How many users to pull before dumping to a file (for the sake of ram)
 
-earliest_timestamp: "2020-07-08T02:59:44Z" # How far back to go (format e.g. 2021-02-11T05:35:34Z)
+earliest_timestamp: "2021-01-01T01:00:00Z" # How far back to go (format e.g. 2021-02-11T05:35:34Z)
